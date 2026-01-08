@@ -90,7 +90,6 @@ event-flow/
 ├── docs/
 │   ├── vision/
 │   │   ├── product-vision.md
-│   │   └── non-goals.md
 │   │
 │   ├── architecture/
 │   │   ├── system-overview.md
