@@ -93,33 +93,3 @@ event-flow/
 │   │
 │   ├── architecture/
 │   │   ├── system-overview.md
-│   │   ├── high-level-diagram.md
-│   │   ├── event-driven-model.md
-│   │   └── service-boundaries.md
-│   │
-│   ├── requirements/
-│   │   ├── prd.md
-│   │   └── functional-requirements.md
-│   │
-│   ├── decisions/
-│   │   ├── adr-0001-event-first-architecture.md
-│   │   ├── adr-0002-microservices-scope.md
-│   │   └── adr-0003-kafka-as-event-backbone.md
-│   │
-│   ├── assessments/
-│   │   ├── tech-assessment-messaging.md
-│   │   ├── tech-assessment-storage.md
-│   │   └── tech-assessment-observability.md
-│   │
-│   ├── rfcs/
-│   │   ├── rfc-0001-event-ingestion-service.md
-│   │   └── rfc-0002-automation-execution-model.md
-│   │
-│   └── diagrams/
-│       ├── context-diagram.drawio
-│       ├── container-diagram.drawio
-│       └── sequence-event-processing.drawio
-│
-└── roadmap/
-    ├── milestones.md
-    └── repo-evolution.md
