@@ -52,6 +52,39 @@ flowchart LR
     KAFKA --> EXEC
 ```
 
+# c4
+```mermaid
+C4Container
+    title Container Diagram - Event Driven Architecture
+
+    Person(user, "User", "Uses the frontend application")
+
+    System_Boundary(system, "Platform") {
+        Container(fe, "Frontend UI", "Web / Mobile App", "User interface")
+        Container(bff, "Backend For Frontend", "API / Node / JVM", "Frontend-oriented backend")
+        Container(gw, "API Gateway", "API Gateway", "Routing and auth")
+
+        Container(ing, "Event Ingestion Service", "Backend Service", "Receives and validates events")
+        Container(auto, "Automation Management Service", "Backend Service", "Manages automations and rules")
+        Container(exec, "Workflow Execution Service", "Backend Service", "Executes workflows")
+
+        ContainerDb(kafka, "Event Streaming Platform", "Kafka", "Event bus")
+    }
+
+    Rel(user, fe, "Uses")
+    Rel(fe, bff, "Calls")
+    Rel(bff, gw, "Routes requests")
+
+    Rel(gw, ing, "Sends events")
+    Rel(gw, auto, "Manages automations")
+    Rel(gw, exec, "Triggers workflows")
+
+    Rel(ing, kafka, "Publishes events")
+    Rel(exec, kafka, "Publishes events")
+
+    Rel(kafka, bff, "Streams events")
+    Rel(kafka, exec, "Streams events")
+```
 ---
 
 ## Decision
