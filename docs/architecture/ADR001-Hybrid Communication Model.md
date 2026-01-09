@@ -6,7 +6,7 @@
 | **Author**       | Marcio Dias |
 | **Contributors** | N/A |
 | **Started at**   | 2026-01-08 |
-| **Status**       | DONE |
+| **Status**       | ACCEPTED |
 | **Description**  | This ADR documents the decision to adopt a hybrid communication model in EventFlow, combining synchronous APIs for user-driven interactions with asynchronous, event-driven communication for workflow execution and state propagation. |
 
 
