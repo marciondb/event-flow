@@ -16,13 +16,13 @@ The BFF is **not** a source of truth and does not execute business logic.
 
 The BFF acts as a frontend-oriented projection and aggregation layer, enabling:
 
-Clean frontend APIs
+- Clean frontend APIs
 
-Decoupled UI evolution
+- Decoupled UI evolution
 
-Event-driven workflow visibility
+- Event-driven workflow visibility
 
-Clear separation between UI concerns and domain logic
+- Clear separation between UI concerns and domain logic
 
 ---
 
@@ -55,21 +55,21 @@ flowchart LR
 
 The BFF has two distinct interaction modes:
 
-Synchronous APIs
+- Synchronous APIs
 
-Serve frontend requests
+- Serve frontend requests
 
-Aggregate and shape data for UI needs
+- Aggregate and shape data for UI needs
 
-Avoid exposing domain APIs directly to the frontend
+- Avoid exposing domain APIs directly to the frontend
 
-Asynchronous Event Consumption
+- Asynchronous Event Consumption
 
-Consume workflow execution events
+- Consume workflow execution events
 
-Build and update UI-specific projections
+- Build and update UI-specific projections
 
-Enable near real-time execution visibility
+- Enable near real-time execution visibility
 
 ---
 ## BFF as a Projection Layer
@@ -123,17 +123,17 @@ sequenceDiagram
 
 The BFF explicitly does not:
 
-Execute business logic
+- Execute business logic
 
-Decide workflow steps
+- Decide workflow steps
 
-Act as a source of truth
+- Act as a source of truth
 
-Publish domain events
+- Publish domain events
 
-Replace backend services
+- Replace backend services
 
-All business decisions remain in core services.
+- All business decisions remain in core services.
 
 ---
 ## Dependency Direction
