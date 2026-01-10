@@ -93,3 +93,6 @@ event-flow/
 │   │
 │   ├── architecture/
 │   │   ├── system-overview.md
+│   |── decisions/
+│   │   ├── ADR001-Hybrid Communication Model.md
+│   │   ├── ADR002-backend-for-frontend-event-driven-projection
