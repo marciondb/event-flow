@@ -8,7 +8,7 @@
 | **Author**       | Marcio Dias |
 | **Contributors** | N/A |
 | **Started at**   | 2026-01-10 |
-| **Status**       | DRAFT |
+| **Status**       | ACCEPTED |
 | **Description**  | This ADR documents the decision to introduce a Backend For Frontend (BFF) responsible for frontend-specific APIs and for maintaining workflow execution state projections derived from events. |
 
 ---
