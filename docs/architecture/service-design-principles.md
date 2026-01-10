@@ -301,14 +301,11 @@ src/
       http_client.clj
       producer.clj
       consumer.clj
-      datomic.clj
     adapters/
       customer.clj
     wire/
       in/
         customer.clj
       out/
-        customer.clj
-      datomic/
         customer.clj
 ```
