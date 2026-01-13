@@ -165,6 +165,19 @@ These choices prioritize learning velocity and clarity over maximum performance.
 
 Kafka is treated as a **core dependency** of the service, not an implementation detail.
 
+---
+## Implementation Guidelines
+
+Implementation of this service should be bootstrapped from the **EventFlow Service Template**.
+
+The template provides:
+- A standardized directory structure
+- Preconfigured TypeScript and test environment
+- Kafka local setup for development
+- A minimal runnable service (hello world)
+- Baseline configuration aligned with Service Design Principles
+
+Using the template ensures architectural consistency across services while allowing each service to evolve independently.
 
 ---
 
