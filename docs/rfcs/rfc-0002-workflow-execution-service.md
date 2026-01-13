@@ -1,5 +1,4 @@
-# Title
-Event Execution Service (v1)
+# Event Execution Service (v1)
 
 ---
 
