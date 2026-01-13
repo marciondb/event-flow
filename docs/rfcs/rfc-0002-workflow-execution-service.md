@@ -131,6 +131,43 @@ Internally, the service adopts a **Diplomat-inspired structure**, ensuring:
 
 ---
 
+## Technology Choices
+
+The following technology choices apply specifically to the Event Execution Service.
+
+### Programming Language
+
+- **Language**: JavaScript
+- **Type System**: TypeScript
+
+#### Rationale
+
+- Strong ecosystem support for event-driven systems
+- Mature Kafka client libraries
+- Excellent developer experience for rapid iteration
+- Type safety to support evolving event schemas
+- Alignment with frontend and BFF technologies
+
+These choices prioritize learning velocity and clarity over maximum performance.
+
+---
+
+### Event Backbone
+
+- **Event Streaming Platform**: Apache Kafka
+
+#### Rationale
+
+- Explicit support for asynchronous, event-driven architectures
+- Clear separation between producers and consumers
+- Durable event storage
+- Industry-standard tooling and mental model
+
+Kafka is treated as a **core dependency** of the service, not an implementation detail.
+
+
+---
+
 ## Assumptions & Mocked Dependencies
 
 For v1 development, the following assumptions apply:
