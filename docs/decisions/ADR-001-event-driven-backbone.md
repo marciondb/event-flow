@@ -1,13 +1,13 @@
-# Hybrid Communication Model (Synchronous APIs + Event-Driven Workflows)
+# Event-Driven Backbone (with Synchronous Edges)
 
 | Field            | Value |
 |------------------|-------|
-| **ADR**          | ADR-0001 |
+| **ADR**          | ADR-001 |
 | **Author**       | Marcio Dias |
 | **Contributors** | N/A |
 | **Started at**   | 2026-01-08 |
 | **Status**       | ACCEPTED |
-| **Description**  | This ADR documents the decision to adopt a hybrid communication model in EventFlow, combining synchronous APIs for user-driven interactions with asynchronous, event-driven communication for workflow execution and state propagation. |
+| **Description**  | This ADR documents the decision to make EventFlow **event-driven by default**: events are the backbone for action and integration between services, while synchronous APIs are a deliberate exception reserved for user-facing configuration and queries (a hybrid model with an event-driven center of gravity). |
 
 
 ## Context
@@ -38,19 +38,22 @@ flowchart LR
 
     KAFKA[(Event Streaming Platform)]
 
-    FE --> BFF
-    BFF --> GW
+    %% Synchronous: user-facing config and queries only (the exception)
+    FE -->|HTTP| BFF
+    BFF -->|HTTP| GW
+    GW -->|HTTP: manage automations| AUTO
+    GW -->|HTTP: publish trigger event| ING
 
-    GW --> ING
-    GW --> AUTO
-    GW --> EXEC
-
-    ING --> KAFKA
-    EXEC --> KAFKA
-
-    KAFKA --> BFF
-    KAFKA --> EXEC
+    %% Asynchronous: action + integration backbone (the default)
+    ING -->|trigger events| KAFKA
+    KAFKA -->|triggers execution| EXEC
+    EXEC -->|lifecycle events| KAFKA
+    KAFKA -->|consume for projections| BFF
 ```
+
+> Note the action path is **event-driven end to end**: the Gateway never calls the
+> Workflow Execution Service directly. Execution is **triggered by a Kafka event**,
+> and services integrate through events — not synchronous service-to-service calls.
 
 # c4
 ```mermaid
@@ -72,29 +75,33 @@ C4Container
     }
 
     Rel(user, fe, "Uses")
-    Rel(fe, bff, "Calls")
-    Rel(bff, gw, "Routes requests")
+    Rel(fe, bff, "Calls (HTTP)")
+    Rel(bff, gw, "Routes requests (HTTP)")
 
-    Rel(gw, ing, "Sends events")
-    Rel(gw, auto, "Manages automations")
-    Rel(gw, exec, "Triggers workflows")
+    Rel(gw, auto, "Manages automations (HTTP, sync)")
+    Rel(gw, ing, "Publishes trigger events (HTTP entrypoint)")
 
-    Rel(ing, kafka, "Publishes events")
-    Rel(exec, kafka, "Publishes events")
-
-    Rel(kafka, bff, "Streams events")
-    Rel(kafka, exec, "Streams events")
+    Rel(ing, kafka, "Publishes trigger events")
+    Rel(kafka, exec, "Triggers execution (async)")
+    Rel(exec, kafka, "Publishes lifecycle events")
+    Rel(kafka, bff, "Streams events for projections")
 ```
 ---
 
 ## Decision
 
-EventFlow will adopt a **hybrid communication model**, where:
+EventFlow adopts a **hybrid communication model with an event-driven backbone**:
 
-- **Synchronous APIs** are used for user-facing and configuration-driven interactions
-- **Asynchronous, event-driven communication** is used for workflow execution, background processing, and state propagation
+- **Asynchronous, event-driven communication is the default** for everything that represents *action* and *integration between services*: triggering automations, executing workflows, and propagating state. Events are the system's **primary integration contract**.
+- **Synchronous APIs are the exception**, used only for *user-facing* interactions that need immediate feedback: managing automation configuration and querying state.
 
-Both communication styles are considered first-class and are applied based on the nature of the interaction rather than enforcing a single architectural paradigm.
+Concretely, this means:
+
+- A workflow is **triggered by an event**, never by a synchronous call. The API Gateway only forwards user intent to the Event Ingestion Service, which publishes a trigger event; the Workflow Execution Service **reacts to that event**.
+- Domain services on the action path **integrate exclusively through events** — there are no direct synchronous service-to-service calls between them.
+- The **only** synchronous paths are `Frontend → BFF → Gateway → {automation config, queries}`.
+
+This keeps the event-driven model as the architectural center of gravity, while avoiding unnecessary asynchrony for simple user-facing reads and writes. It is a deliberate rejection of "synchronous-first with events bolted on": here, **events come first and synchronous calls are the narrow exception**.
 
 ---
 
@@ -158,4 +165,7 @@ Core workflows are asynchronous, with minimal synchronous endpoints.
 
 - Product Vision — EventFlow
 - System Overview — EventFlow (v2)
-- ADR-0002 — Backend For Frontend as an Event-Driven Projection Layer (planned)
+- ADR-002 — Backend For Frontend as an Event-Driven Projection Layer
+- ADR-004 — Eventing Model & Delivery Semantics
+- ADR-005 — Choreography over Orchestration
+- RFC-001 — End-to-End Flow & Service Landscape

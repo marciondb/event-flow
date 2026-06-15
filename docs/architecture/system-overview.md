@@ -12,10 +12,12 @@ This document intentionally avoids implementation details and serves as a founda
 
 ## Architectural Style
 
-EventFlow adopts a **hybrid architectural model**, combining:
+EventFlow adopts a **hybrid architectural model with an event-driven backbone**, combining:
 
 - Synchronous, request-response APIs for user-driven interactions
 - Asynchronous, event-driven communication for automation execution and state propagation
+
+Event-driven communication is the **default** for action and integration between services; synchronous APIs are the **exception**, reserved for user-facing configuration and queries. In particular, **workflows are triggered by events, never by direct synchronous calls between services** (see ADR-001).
 
 This approach balances usability, scalability, and architectural realism.
 
@@ -128,7 +130,10 @@ Synchronous APIs are used when:
 Typical synchronous flows include:
 - Frontend → BFF
 - BFF → API Gateway
-- API Gateway → backend services
+- API Gateway → Automation Management (configuration)
+- API Gateway → Event Ingestion (HTTP entrypoint that publishes a trigger event)
+
+Synchronous calls stop at the boundary that publishes an event; the action path beyond that is asynchronous.
 
 ---
 
@@ -141,7 +146,9 @@ Asynchronous communication is used when:
 - Isolating failures between components
 
 Typical asynchronous flows include:
-- Backend services publishing workflow events
+- Event Ingestion publishing trigger events
+- Workflow Execution consuming trigger events to start execution
+- Backend services publishing workflow lifecycle events
 - BFF consuming events to update UI projections
 - Multiple services reacting independently to the same event
 
