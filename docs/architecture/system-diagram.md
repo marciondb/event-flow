@@ -85,8 +85,8 @@ flowchart LR
     EVENT[Event Stream]
 
     subgraph Boundary["Boundary (External)"]
-        CONSUMER[Consumer (Diplomat)]
-        PRODUCER[Producer (Diplomat)]
+        CONSUMER["Consumer (Diplomat)"]
+        PRODUCER["Producer (Diplomat)"]
         ADAPTER2[Adapter]
     end
 
