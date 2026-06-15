@@ -4,7 +4,7 @@
 
 | Field            | Value |
 |------------------|-------|
-| **RFC**          | RFC-0001 |
+| **RFC**          | RFC-001 |
 | **Author**       | Marcio Dias |
 | **Contributors** | N/A |
 | **Started at**   | 2026-01-13 |
@@ -70,8 +70,9 @@ EventFlow v1 focuses on a **minimal but complete automation loop**.
   - One triggering event
   - One or more actions
 - Events can be:
-  - Manually published (simulated producers)
-- Automations can be:
+  - Published into the system through the **Event Ingestion Service** (via simulated producers in v1)
+- Automations are:
+  - **Triggered by an event** (not by a synchronous call)
   - Executed asynchronously
 - Workflow execution emits lifecycle events:
   - Started
@@ -93,18 +94,18 @@ EventFlow v1 focuses on a **minimal but complete automation loop**.
 
 At a high level, the v1 flow is:
 
-1. A user creates an automation via the frontend
+1. A user creates an automation via the frontend (synchronous: `Frontend → BFF → Gateway → Automation Management`)
 2. Automation configuration is stored
-3. An event is published into the system
-4. The event triggers workflow execution
-5. Workflow execution emits lifecycle events
-6. Execution state is projected and exposed to the UI
+3. An event is published into the system through the **Event Ingestion Service**, which validates it and emits a **trigger event** to the Event Backbone
+4. The **Workflow Execution Service consumes the trigger event** and starts executing — the trigger is an event, never a direct call
+5. Workflow execution emits lifecycle events (started / completed / failed) to the Event Backbone
+6. The BFF consumes those events, updates its projections, and the frontend queries the BFF for status
 
 This flow intentionally exercises:
-- Synchronous APIs (configuration, queries)
-- Asynchronous processing (execution)
-- Event propagation
-- Observability
+- Synchronous APIs **only** for user-facing configuration and queries
+- **Event-triggered**, asynchronous execution (the action path is event-driven end to end)
+- Event propagation as the integration contract between services
+- Observability through event-derived projections
 
 ---
 
@@ -142,21 +143,35 @@ These are **initial candidates**, not final boundaries.
 
 ---
 
-### 3. Workflow Execution Service
+### 3. Event Ingestion Service
 
 **Responsibility**
+- Provide the synchronous HTTP entrypoint that turns user/system intent into events
+- Validate incoming events and publish them to the Event Backbone as **trigger events**
+- Decouple "something happened" from "a workflow runs"
+
+**Why in v1**
+- It is the component that makes the platform genuinely **event-driven**: workflows are triggered by events, not by direct service-to-service calls
+- Even with simulated producers, it establishes the **event-as-trigger contract** from day one
+
+---
+
+### 4. Workflow Execution Service
+
+**Responsibility**
+- **React to trigger events** consumed from the Event Backbone
 - Execute automations when triggered
 - Coordinate workflow steps
 - Emit execution lifecycle events
 
 **Why in v1**
 - Core domain of the system
-- Produces events consumed by other services
+- Consumes trigger events and produces lifecycle events
 - Validates the event-driven architecture
 
 ---
 
-### 4. Event Backbone (Streaming Platform)
+### 5. Event Backbone (Streaming Platform)
 
 **Responsibility**
 - Transport events between services
@@ -168,7 +183,7 @@ These are **initial candidates**, not final boundaries.
 
 ---
 
-### 5. Backend For Frontend (BFF)
+### 6. Backend For Frontend (BFF)
 
 **Responsibility**
 - Serve frontend-specific APIs
@@ -203,36 +218,40 @@ flowchart LR
 
     AUTO[Automation Management Service]
 
+    ING[Event Ingestion Service]
+
     EXEC[Workflow Execution Service]
 
     KAFKA[(Event Backbone)]
 
-    %% Synchronous interactions
+    %% Synchronous interactions (user-facing config and queries only)
     FE -->|HTTP| BFF
     BFF -->|HTTP| GW
-    GW -->|HTTP| AUTO
-    GW -->|HTTP| EXEC
+    GW -->|HTTP: manage automations| AUTO
+    GW -->|HTTP: publish trigger event| ING
 
-    %% Asynchronous interactions
-    EXEC -->|execution events| KAFKA
-    KAFKA -->|consume| BFF
+    %% Asynchronous interactions (action + integration backbone)
+    ING -->|trigger events| KAFKA
+    KAFKA -->|triggers execution| EXEC
+    EXEC -->|lifecycle events| KAFKA
+    KAFKA -->|consume for projections| BFF
 ```
 
 ### Flow Description
 
 - The Frontend interacts exclusively with the BFF
 
-- The BFF delegates configuration and command requests to the API Gateway
+- The BFF delegates **only** user-facing requests to the API Gateway (configuration and queries)
 
-- The API Gateway routes requests to:
+- The API Gateway routes synchronous requests to:
 
 - Automation Management Service (configuration)
 
-- Workflow Execution Service (execution commands)
+- Event Ingestion Service (HTTP entrypoint that publishes a **trigger event**)
 
-- The Workflow Execution Service executes workflows asynchronously
+- The Workflow Execution Service **does not receive synchronous calls** — it is triggered by consuming a trigger event from the Event Backbone
 
-- Execution lifecycle events are published to the Event Backbone
+- The Workflow Execution Service executes workflows asynchronously and publishes lifecycle events to the Event Backbone
 
 - The BFF consumes execution events and maintains UI-specific projections
 
@@ -254,9 +273,7 @@ This diagram represents the minimal complete loop for EventFlow v1
 
 - Future versions may introduce:
 
-- Event Ingestion Service
-
-- External event producers
+- External / third-party event producers feeding the Event Ingestion Service
 
 - Notification services
 
@@ -270,7 +287,7 @@ This diagram represents the minimal complete loop for EventFlow v1
 
 The following services are intentionally **not part of v1**, but are expected to appear later:
 
-- Event Ingestion Service (external producers)
+- External / third-party event producers (the v1 Event Ingestion Service uses simulated producers)
 - Notification Service
 - Advanced Rules Engine
 - External Integration Connectors
@@ -313,5 +330,8 @@ These trade-offs are accepted to preserve focus and learning value.
 
 - Product Vision — EventFlow
 - System Overview — EventFlow (v2)
-- ADR-0001 — Hybrid Communication Model
-- ADR-0002 — Backend For Frontend as an Event-Driven Projection Layer
+- ADR-001 — Event-Driven Backbone
+- ADR-002 — Backend For Frontend as an Event-Driven Projection Layer
+- ADR-004 — Eventing Model & Delivery Semantics
+- ADR-005 — Choreography over Orchestration
+- RFC-002 — Workflow Execution Service
