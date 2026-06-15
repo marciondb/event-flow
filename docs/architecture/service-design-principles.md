@@ -291,21 +291,21 @@ Directory Structure
 ```
 src/
     models/
-      customer.clj
+      customer.ts
     logic/
-      customer.clj
+      customer.ts
     controllers/
-      customer.clj
+      customer.ts
     diplomat/
-      http_server.clj
-      http_client.clj
-      producer.clj
-      consumer.clj
+      http-server.ts
+      http-client.ts
+      producer.ts
+      consumer.ts
     adapters/
-      customer.clj
+      customer.ts
     wire/
       in/
-        customer.clj
+        customer.ts
       out/
-        customer.clj
+        customer.ts
 ```
