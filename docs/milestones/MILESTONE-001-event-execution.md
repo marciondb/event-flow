@@ -54,7 +54,7 @@ Jest was chosen due to:
 Create the service repository and establish a consistent development environment.
 
 **Includes**
-- Create repository: `event-flow-event-execution`
+- Create repository: `event-flow-workflow-execution`
 - Initialize Node.js project
 - Configure TypeScript
 - Configure linting and formatting
@@ -181,17 +181,19 @@ Enable the service to emit execution lifecycle events.
 ### Task 7 — Kafka Consumer Integration
 
 **Goal**  
-Enable the service to consume events (including self-produced events).
+Enable the service to consume the **trigger event** that starts an execution (plus its own events for validation).
 
 **Includes**
 - Kafka consumer configuration
-- Event deserialization
-- Basic event handling (logging or no-op)
+- Event deserialization and envelope validation
+- Consume `automation_trigger_requested` → start an execution
+- Idempotent handling using `event_id` (no duplicate execution on redelivery)
 - Integration test covering consumption
 
 **Acceptance Criteria**
-- Events are consumed successfully
+- A trigger event consumed from Kafka starts an execution
 - Unexpected payloads do not crash the service
+- Redelivering the same `event_id` does not start a second execution
 - Clear logging for consumed events
 
 ---
@@ -199,17 +201,18 @@ Enable the service to consume events (including self-produced events).
 ### Task 8 — End-to-End Execution Simulation
 
 **Goal**  
-Demonstrate a complete execution lifecycle using Kafka.
+Demonstrate a complete, **event-triggered** execution lifecycle using Kafka.
 
 **Includes**
-- Trigger execution
+- Publish a `automation_trigger_requested` event (simulated producer) that the service consumes to start execution
 - Simulated workflow step
-- Emission of lifecycle events
-- Optional self-consumption for validation
+- Emission of lifecycle events (`started` / `completed` / `failed`)
+- `correlation_id` propagated from the trigger event through all lifecycle events
 
 **Acceptance Criteria**
-- Execution lifecycle is observable
-- Events flow through Kafka
+- Execution is started by an event, not by a direct call
+- Execution lifecycle is observable end to end via Kafka
+- `correlation_id` is the same across trigger and lifecycle events
 - Service operates asynchronously
 
 ---
