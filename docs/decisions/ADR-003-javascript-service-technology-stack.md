@@ -4,7 +4,7 @@
 
 | Field            | Value |
 |------------------|-------|
-| **ADR**          | ADR-0003 |
+| **ADR**          | ADR-003 |
 | **Author**       | Marcio Dias |
 | **Contributors** | N/A |
 | **Started at**   | 2026-01-14 |
@@ -169,5 +169,6 @@ For example:
 
 - Service Design Principles (`service-design-principles.md`)
 - Service Bootstrap (`service-bootstrap.md`)
-- ADR-0001 — Hybrid Communication Model
-- ADR-0002 — Backend For Frontend as an Event-Driven Projection Layer
+- ADR-001 — Event-Driven Backbone
+- ADR-002 — Backend For Frontend as an Event-Driven Projection Layer
+- ADR-004 — Eventing Model & Delivery Semantics

@@ -4,7 +4,7 @@
 
 | Field            | Value |
 |------------------|-------|
-| **ADR**          | ADR-0002 |
+| **ADR**          | ADR-002 |
 | **Author**       | Marcio Dias |
 | **Contributors** | N/A |
 | **Started at**   | 2026-01-10 |
@@ -114,4 +114,5 @@ Backend services provide APIs tailored for frontend needs.
 
 - Product Vision — EventFlow
 - System Overview — EventFlow (v2)
-- ADR-0001 — Hybrid Communication Model (Synchronous APIs + Event-Driven Workflows)
+- ADR-001 — Event-Driven Backbone (with Synchronous Edges)
+- ADR-004 — Eventing Model & Delivery Semantics
